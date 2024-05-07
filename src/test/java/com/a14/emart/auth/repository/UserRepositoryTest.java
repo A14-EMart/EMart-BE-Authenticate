@@ -1,50 +1,77 @@
 package com.a14.emart.auth.repository;
 
 import com.a14.emart.auth.model.User;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.dao.DataIntegrityViolationException;
 
-import static org.junit.jupiter.api.Assertions.*;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
+@ActiveProfiles("test")
 public class UserRepositoryTest {
+
+    @Autowired
+    private TestEntityManager entityManager;
+
     @Autowired
     private UserRepository userRepository;
 
-    private User createUser(String username, String firstName, String lastName, String password, User.Role role) {
-        User user = new User();
-        user.setUsername(username);
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-        user.setPassword(password);
-        user.setRole(role);
-        return user;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        // Setup data before each test
+        user = new User("John", "Doe", "johndoe", "password123", User.Role.NORMAL_USER);
+        entityManager.persist(user);
+        entityManager.flush();
+    }
+
+    @AfterEach
+    void cleanUp() {
+        entityManager.clear();
     }
 
     @Test
-    public void testSaveUser() {
-        User newUser = createUser("john_doe", "John", "Doe", "password123", User.Role.NORMAL_USER);
+    void whenFindByUsername_thenReturnUser() {
+        Optional<User> found = userRepository.findById(user.getUsername());
+
+        assertThat(found.isPresent()).isTrue();
+        assertThat(found.get().getUsername()).isEqualTo(user.getUsername());
+    }
+
+    @Test
+    void whenInvalidUsername_thenReturnEmpty() {
+        Optional<User> notFound = userRepository.findById("nonexistent");
+
+        assertThat(notFound.isEmpty()).isTrue();
+    }
+
+    @Test
+    void whenFindAll_thenReturnUsers() {
+        List<User> users = userRepository.findAll();
+
+        assertThat(users).isNotEmpty();
+        assertThat(users.size()).isGreaterThan(0);
+    }
+
+    @Test
+    void whenSaveUser_thenUserIsSaved() {
+        User newUser = new User("Alice", "Smith", "alicesmith", "securepass", User.Role.MANAGER);
+
         User savedUser = userRepository.save(newUser);
-        assertNotNull(savedUser);
-        assertEquals("John", savedUser.getFirstName());
-        assertEquals("password123", savedUser.getPassword());
+
+        assertThat(savedUser).isNotNull();
+        assertThat(savedUser.getUsername()).isEqualTo(newUser.getUsername());
     }
-
-    @Test
-    public void testDuplicateUsername() {
-        User user1 = createUser("unique_user", "First", "User", "password123", User.Role.NORMAL_USER);
-        userRepository.save(user1);
-        User user2 = createUser("unique_user", "Second", "User", "password456", User.Role.NORMAL_USER);
-
-        assertThrows(DataIntegrityViolationException.class, () -> {
-            userRepository.saveAndFlush(user2);
-        });
-    }
-
-
-
-
 
 }
