@@ -31,13 +31,13 @@ public class AuthService {
     public LoginResponse register(RegisterRequest request) {
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
-        Optional<User> existingUser = userRepository.findByUsernameOrEmail(request.getUsername(), request.getEmail());
-        if (existingUser.isPresent()) {
-            User user = existingUser.get();
-            if (user.getUsername().equals(request.getUsername())) {
-                throw new IllegalArgumentException("Username is already taken.");
-            } else {
-                throw new IllegalArgumentException("Email is already in use.");
+        Optional<User> existingUser = userRepository.findByUsername(request.getUsername());
+        if(existingUser.isPresent()) {
+            throw new IllegalArgumentException("Username is already taken.");
+        }else{
+            existingUser = userRepository.findByEmail(request.getEmail());
+            if(existingUser.isPresent()) {
+                throw new IllegalArgumentException("Email is already taken.");
             }
         }
 
@@ -69,9 +69,9 @@ public class AuthService {
         Optional<User> userOptional;
 
         if (usernameOrEmail.contains("@")) {
-            userOptional = userRepository.findByUsernameOrEmail(null, usernameOrEmail);
+            userOptional = userRepository.findByUsername(usernameOrEmail);
         } else {
-            userOptional = userRepository.findByUsernameOrEmail(usernameOrEmail, null);
+            userOptional = userRepository.findByEmail(usernameOrEmail);
         }
 
         User user = userOptional.orElseThrow(() -> new UsernameNotFoundException("User not found"));

@@ -9,8 +9,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class UserService {
     UserRepository userRepository;
-    public User findByUsernameOrEmail(String username, String email) {
-        return userRepository.findByUsernameOrEmail(username, email).orElseThrow();
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username).orElseThrow();
+    }
+    public User findByEmail(String email) {
+        return userRepository.findByEmail(email).orElseThrow();
+
     }
 
 }
