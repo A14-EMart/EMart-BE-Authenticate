@@ -61,7 +61,7 @@ public class AuthService {
 
 
     public LoginResponse authenticate(LoginRequest request) {
-        String usernameOrEmail = request.getUsernameOrEmail();
+        String usernameOrEmail = request.getUsername();
         if (usernameOrEmail == null) {
             throw new NoSuchElementException("Username or email must be provided");
         }

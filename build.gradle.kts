@@ -53,6 +53,7 @@ dependencies {
 	testImplementation("org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion")
 	testImplementation("io.github.bonigarcia:selenium-jupiter:$seleniumJupiterVersion")
 	testRuntimeOnly("com.h2database:h2")
+	implementation("io.github.cdimascio:dotenv-java:2.2.3")
 }
 
 tasks.register<Test>("unitTest") {
