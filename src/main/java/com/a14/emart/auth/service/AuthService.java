@@ -8,12 +8,12 @@ import com.a14.emart.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Service
@@ -61,20 +61,24 @@ public class AuthService {
 
 
     public LoginResponse authenticate(LoginRequest request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                request.getUsernameOrEmail(),
-                request.getPassword()));
         String usernameOrEmail = request.getUsernameOrEmail();
+        if (usernameOrEmail == null) {
+            throw new NoSuchElementException("Username or email must be provided");
+        }
+
+        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                usernameOrEmail,
+                request.getPassword()));
 
         Optional<User> userOptional;
 
         if (usernameOrEmail.contains("@")) {
-            userOptional = userRepository.findByUsername(usernameOrEmail);
-        } else {
             userOptional = userRepository.findByEmail(usernameOrEmail);
+        } else {
+            userOptional = userRepository.findByUsername(usernameOrEmail);
         }
 
-        User user = userOptional.orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User user = userOptional.orElseThrow(() -> new NoSuchElementException("User not found"));
 
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("userId", user.getId());
@@ -83,4 +87,5 @@ public class AuthService {
         var jwtToken = jwtService.generateToken(extraClaims, user);
         return LoginResponse.builder().token(jwtToken).build();
     }
+
 }
