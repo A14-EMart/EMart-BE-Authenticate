@@ -3,6 +3,7 @@ package com.a14.emart.auth.service;
 import com.a14.emart.auth.dto.LoginRequest;
 import com.a14.emart.auth.dto.LoginResponse;
 import com.a14.emart.auth.dto.RegisterRequest;
+import com.a14.emart.auth.dto.UserProfile;
 import com.a14.emart.auth.model.User;
 import com.a14.emart.auth.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -79,13 +80,22 @@ public class AuthService {
         }
 
         User user = userOptional.orElseThrow(() -> new NoSuchElementException("User not found"));
+        UserProfile profile = UserProfile.builder().
+                id(user.getId()).
+                username(user.getUsername()).
+                email(user.getEmail()).
+                role(user.getRole()).
+                build();
 
         Map<String, Object> extraClaims = new HashMap<>();
         extraClaims.put("userId", user.getId());
         extraClaims.put("role", user.getRole());
 
         var jwtToken = jwtService.generateToken(extraClaims, user);
-        return LoginResponse.builder().token(jwtToken).build();
+        return LoginResponse.builder().
+                token(jwtToken).
+                userProfile(profile).
+                build();
     }
 
 }

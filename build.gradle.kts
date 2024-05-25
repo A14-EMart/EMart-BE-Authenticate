@@ -54,6 +54,7 @@ dependencies {
 	testImplementation("io.github.bonigarcia:selenium-jupiter:$seleniumJupiterVersion")
 	testRuntimeOnly("com.h2database:h2")
 	implementation("io.github.cdimascio:dotenv-java:2.2.3")
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
 }
 
 tasks.register<Test>("unitTest") {
