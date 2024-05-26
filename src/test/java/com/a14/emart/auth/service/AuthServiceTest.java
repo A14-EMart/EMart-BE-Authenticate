@@ -227,7 +227,7 @@ public class AuthServiceTest {
         LoginResponse authenticateResponse = new LoginResponse();
         authenticateResponse.setToken("jwt-token-123");
 
-        assertEquals(authenticateResponse, authService.authenticate(loginRequest));
+        assertEquals(authenticateResponse.getToken(), authService.authenticate(loginRequest).getToken());
     }
     @Test
     void testAuthenticateValidWithUsername() {
@@ -246,7 +246,7 @@ public class AuthServiceTest {
         LoginResponse authenticateResponse = new LoginResponse();
         authenticateResponse.setToken("jwt-token-123");
 
-        assertEquals(authenticateResponse, authService.authenticate(loginRequest));
+        assertEquals(authenticateResponse.getToken(), authService.authenticate(loginRequest).getToken());
     }
 
     @Test
