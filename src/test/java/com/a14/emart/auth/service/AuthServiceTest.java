@@ -58,7 +58,7 @@ public class AuthServiceTest {
                 .role("admin")
                 .build();
         LoginRequest registerRequest = new LoginRequest();
-        registerRequest.setUsernameOrEmail(email);
+        registerRequest.setUsername(username);
         registerRequest.setPassword(password);
     }
 
@@ -221,7 +221,7 @@ public class AuthServiceTest {
 
 
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsernameOrEmail(user.getEmail());
+        loginRequest.setUsername(user.getUsername());
         loginRequest.setPassword("abcdefgh1");
 
         LoginResponse authenticateResponse = new LoginResponse();
@@ -240,7 +240,7 @@ public class AuthServiceTest {
 
         System.out.println(user.getUsername());
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsernameOrEmail(user.getUsername());
+        loginRequest.setUsername(user.getUsername());
         loginRequest.setPassword("abcdefgh1");
 
         LoginResponse authenticateResponse = new LoginResponse();
@@ -252,7 +252,7 @@ public class AuthServiceTest {
     @Test
     void testInvalidAuthenticateWithInvalidPassword() {
         LoginRequest authenticateRequest = new LoginRequest();
-        authenticateRequest.setUsernameOrEmail("usertest1@gmail.com");
+        authenticateRequest.setUsername("usertest1");
         authenticateRequest.setPassword("xixixixixi");
 
         doThrow(new NoSuchElementException("User not found"))
@@ -264,7 +264,7 @@ public class AuthServiceTest {
     @Test
     void testInvalidAuthenticateWithMissingPassword() {
         LoginRequest authenticateRequest = new LoginRequest();
-        authenticateRequest.setUsernameOrEmail("usertest1");
+        authenticateRequest.setUsername("usertest1");
 
         assertThrows(NoSuchElementException.class, () -> authService.authenticate(authenticateRequest));
     }
