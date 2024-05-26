@@ -22,36 +22,71 @@ repositories {
 	mavenCentral()
 }
 
+var jsonwebtokenVersion = "0.11.5"
+var seleniumJavaVersion = "4.14.1"
+var seleniumJupiterVersion = "5.0.1"
+var junitJupiterVersion = "5.9.1"
+var webdrivermanagerVersion = "5.6.3"
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-webflux")
+	implementation("org.springframework.cloud:spring-cloud-starter-gateway-mvc:4.1.3")
 	compileOnly("org.projectlombok:lombok")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-	runtimeOnly("org.postgresql:postgresql")
-	runtimeOnly("com.h2database:h2:2.2.222")
+	implementation("org.postgresql:postgresql")
+	implementation("io.jsonwebtoken:jjwt-api:$jsonwebtokenVersion")
+	implementation("io.jsonwebtoken:jjwt-impl:$jsonwebtokenVersion")
+	implementation("io.jsonwebtoken:jjwt-jackson:$jsonwebtokenVersion")
+	implementation("org.springframework.security:spring-security-core")
+	implementation("org.springframework.security:spring-security-web")
+	implementation("org.springframework.boot:spring-boot-starter-security")
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.security:spring-security-test")
+	testImplementation("org.junit.jupiter:junit-jupiter-api:$junitJupiterVersion")
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junitJupiterVersion")
+	testImplementation("io.github.bonigarcia:webdrivermanager:$webdrivermanagerVersion")
+	testImplementation("org.seleniumhq.selenium:selenium-java:$seleniumJavaVersion")
+	testImplementation("io.github.bonigarcia:selenium-jupiter:$seleniumJupiterVersion")
+	testRuntimeOnly("com.h2database:h2")
+	implementation("io.github.cdimascio:dotenv-java:2.2.3")
+	implementation("org.springframework.boot:spring-boot-starter-amqp")
 }
 
-tasks.withType<Test> {
+tasks.register<Test>("unitTest") {
+	description = "Runs unit tests."
+	group = "verification"
+
+	filter {
+		excludeTestsMatching("*FunctionalTest")
+	}
+}
+
+tasks.register<Test>("functionalTest") {
+	description = "Runs functional tests."
+	group = "verification"
+
+	filter {
+		includeTestsMatching("*FunctionalTest")
+	}
+}
+
+tasks.withType<Test>().configureEach {
 	useJUnitPlatform()
 }
 
 tasks.test {
-	useJUnitPlatform()
-	finalizedBy(tasks.jacocoTestReport) //to always generate report after tests
+	filter {
+		excludeTestsMatching("*FunctionalTest")
+	}
+
+	finalizedBy(tasks.jacocoTestReport)
 }
 
 tasks.jacocoTestReport {
-	classDirectories.setFrom(files(classDirectories.files.map{
-		fileTree(it) {exclude("**/*Application**")}
-	}))
 	dependsOn(tasks.test)
-	reports {
-		xml.required.set(false)
-		csv.required.set(false)
-		html.outputLocation.set(layout.buildDirectory.dir("jacocoHtml"))
-	}
 }
