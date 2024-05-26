@@ -58,7 +58,7 @@ public class AuthServiceTest {
                 .role("admin")
                 .build();
         LoginRequest registerRequest = new LoginRequest();
-        registerRequest.setUsername(username);
+        registerRequest.setUsername(email);
         registerRequest.setPassword(password);
     }
 
@@ -221,7 +221,7 @@ public class AuthServiceTest {
 
 
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername(user.getUsername());
+        loginRequest.setUsername(user.getEmail());
         loginRequest.setPassword("abcdefgh1");
 
         LoginResponse authenticateResponse = new LoginResponse();
@@ -252,7 +252,7 @@ public class AuthServiceTest {
     @Test
     void testInvalidAuthenticateWithInvalidPassword() {
         LoginRequest authenticateRequest = new LoginRequest();
-        authenticateRequest.setUsername("usertest1");
+        authenticateRequest.setUsername("usertest1@gmail.com");
         authenticateRequest.setPassword("xixixixixi");
 
         doThrow(new NoSuchElementException("User not found"))
