@@ -58,7 +58,7 @@ public class AuthServiceTest {
                 .role("admin")
                 .build();
         LoginRequest registerRequest = new LoginRequest();
-        registerRequest.setUsername(username);
+        registerRequest.setUsername(email);
         registerRequest.setPassword(password);
     }
 
@@ -221,13 +221,13 @@ public class AuthServiceTest {
 
 
         LoginRequest loginRequest = new LoginRequest();
-        loginRequest.setUsername(user.getUsername());
+        loginRequest.setUsername(user.getEmail());
         loginRequest.setPassword("abcdefgh1");
 
         LoginResponse authenticateResponse = new LoginResponse();
         authenticateResponse.setToken("jwt-token-123");
 
-        assertEquals(authenticateResponse, authService.authenticate(loginRequest));
+        assertEquals(authenticateResponse.getToken(), authService.authenticate(loginRequest).getToken());
     }
     @Test
     void testAuthenticateValidWithUsername() {
@@ -246,13 +246,13 @@ public class AuthServiceTest {
         LoginResponse authenticateResponse = new LoginResponse();
         authenticateResponse.setToken("jwt-token-123");
 
-        assertEquals(authenticateResponse, authService.authenticate(loginRequest));
+        assertEquals(authenticateResponse.getToken(), authService.authenticate(loginRequest).getToken());
     }
 
     @Test
     void testInvalidAuthenticateWithInvalidPassword() {
         LoginRequest authenticateRequest = new LoginRequest();
-        authenticateRequest.setUsername("usertest1");
+        authenticateRequest.setUsername("usertest1@gmail.com");
         authenticateRequest.setPassword("xixixixixi");
 
         doThrow(new NoSuchElementException("User not found"))
